@@ -165,7 +165,7 @@ wrap_start(StartFun) ->
 
 convert_modules(S) ->
   F = fun(Mod) -> convert_module(Mod, S) end,
-  "[\n" ++ join(lists:map(F, imported_modules(S)), ",\n") ++ "\n]\n".
+  "[\n" ++ string:join(lists:map(F, imported_modules(S)), ",\n") ++ "\n]\n".
 
 convert_module(Mod, S) ->
   {ok, CoveredLines0} = analyze(S, Mod),
@@ -252,11 +252,6 @@ escape_str(Str) ->
          ],
   lists:foldl(fun(F, S) -> F(S) end, Str, Funs).
 
-join(List, Sep) -> join1([E || E <- List, E /= ""], Sep).
-
-join1([H], _Sep)  -> H;
-join1([H|T], Sep) -> H ++ Sep ++ join1(T, Sep).
-
 replace_char("", _, _)    -> "";
 replace_char([E|S], E, R) -> R ++ replace_char(S, E, R);
 replace_char([C|S], E, R) -> [C | replace_char(S, E, R)].
@@ -340,14 +335,7 @@ count_lines_test_() ->
   , ?_assertEqual(2, count_lines("foo\nbar\n"))
   ].
 
-join_test_() ->
-  [ ?_assertEqual("a,b"  , join(["a","b"], ","))
-  , ?_assertEqual("a,b,c", join(["a","b","c"], ","))
-  , ?_assertEqual("a,c"  , join(["a","","c"], ","))
-  , ?_assertEqual("a,b"  , join(["a","b",""], ","))
-  ].
-
-replce_char_test_() ->
+replace_char_test_() ->
   [ ?_assertEqual("foobarfoo", replace_char("foo\nfoo", $\n, "bar"))
   , ?_assertEqual("foobarfoo", replace_char("foo\\foo", $\\, "bar"))
   , ?_assertEqual("foobarfoo", replace_char("foo\"foo", $", "bar")) %"
